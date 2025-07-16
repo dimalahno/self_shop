@@ -11,6 +11,7 @@ class User(Base):
     email = Column(String, unique=True, index=True)
     password = Column(String)
     is_active = Column(Boolean, default=True)
+    role = Column(String, default='user')
 
     # Дополнительно, если надо, relationship на заказы
     # orders = relationship("Order", back_populates="user")
