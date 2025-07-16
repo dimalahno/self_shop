@@ -1,8 +1,9 @@
-from fastapi import APIRouter, Request, Depends
+from fastapi import APIRouter, Request, Depends, Form
 from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import Session
 from .. import models, database
+from fastapi.responses import RedirectResponse
 
 router = APIRouter()
 
@@ -20,6 +21,28 @@ async def read_home(request: Request, db: Session = Depends(database.get_db)):
 async def read_catalog(request: Request, db: Session = Depends(database.get_db)):
     db_products = db.query(models.Product).all()
     return templates.TemplateResponse("catalog.html", {"request": request, "products": db_products})
+
+@router.post("/catalog")
+async def create_product_catalog(
+    request: Request,
+    name: str = Form(...),
+    description: str = Form(None),
+    price: float = Form(...),
+    category_id: int = Form(...),
+    image_url: str = Form(...),
+    db: Session = Depends(database.get_db)
+):
+    product = models.Product(
+        name=name,
+        description=description,
+        price=price,
+        category_id=category_id,
+        image_url=image_url
+    )
+    db.add(product)
+    db.commit()
+    db.refresh(product)
+    return RedirectResponse(url="/catalog", status_code=303)
 
 # Страница корзины
 @router.get("/cart", response_class=HTMLResponse)
