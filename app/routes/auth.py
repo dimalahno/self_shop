@@ -32,7 +32,7 @@ async def register_user_form(request: Request,
     db.add(db_user)
     db.commit()
     db.refresh(db_user)
-    return RedirectResponse(url="/login", status_code=303)
+    return RedirectResponse(url="/", status_code=303)
 
 # HTML-форма логина
 @router.get("/login", response_class=HTMLResponse)
@@ -48,7 +48,7 @@ async def login_user_form(request: Request,
     if db_user is None or not auth.verify_password(password, db_user.password):
         return templates.TemplateResponse("login.html", {"request": request, "error": "Неверные учетные данные"})
     access_token = auth.create_access_token(data={"sub": db_user.id, "role": db_user.role})
-    response = RedirectResponse(url="/admin-panel" if db_user.role == "admin" else "/", status_code=303)
+    response = RedirectResponse(url="/", status_code=303)
     response.set_cookie(key="access_token", value=access_token, httponly=True)
     return response
 
