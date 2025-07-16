@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Каталог товаров</title>
+</head>
+<body>
+    <nav>
+        <a href="/">Главная</a> |
+        <a href="/catalog">Каталог</a> |
+        <a href="/cart">Корзина</a>
+    </nav>
+    <h1>Каталог товаров</h1>
+    <ul>
+        {% for product in products %}
+        <li>
+            <strong>{{ product.name }}</strong><br>
+            Цена: {{ product.price }}<br>
+            <a href="#" onclick="addToCart('{{ product.id }}')">Добавить в корзину</a>
+        </li>
+        {% endfor %}
+    </ul>
+
+    <div id="cart-info">
+        <a href="/cart">Перейти в корзину</a>
+    </div>
+    
+
+    <script>
+        function addToCart(productId) {
+            fetch(`/cart/add/${productId}`, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    alert('Товар добавлен в корзину');
+                    updateCartUI();
+                });
+        }
+    
+        function updateCartUI() {
+            // Делаем запрос для получения актуального состояния корзины (можно улучшить)
+            fetch('/cart')
+                .then(response => response.text())
+                .then(html => {
+                    document.getElementById("cart-info").innerHTML = html;
+                });
+        }
+    </script>
+    
+</body>
+</html>
